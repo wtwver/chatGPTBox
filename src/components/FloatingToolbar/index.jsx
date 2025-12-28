@@ -3,6 +3,7 @@ import ConversationCard from '../ConversationCard'
 import PropTypes from 'prop-types'
 import { config as toolsConfig } from '../../content-script/selection-tools'
 import { getClientPosition, isMobile, setElementPositionInViewport } from '../../utils'
+import { getCoreContentText } from '../../utils/get-core-content-text'
 import Draggable from 'react-draggable'
 import { useClampWindowSize } from '../../hooks/use-clamp-window-size'
 import { useTranslation } from 'react-i18next'
@@ -147,7 +148,10 @@ function FloatingToolbar(props) {
     for (const tool of config.customSelectionTools) {
       if (tool.active) {
         pushTool(tool.iconKey, tool.name, async (selection) => {
-          return tool.prompt.replace('{{selection}}', selection)
+          const pageContent = tool.prompt.includes('{{page}}') ? getCoreContentText() : ''
+          return tool.prompt
+            .replaceAll('{{selection}}', selection)
+            .replaceAll('{{page}}', pageContent)
         })
       }
     }
